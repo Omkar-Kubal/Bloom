@@ -31,6 +31,7 @@ import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.FitnessCenter
 import androidx.compose.material.icons.rounded.LocalPhone
 import androidx.compose.material.icons.rounded.MonitorHeart
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -82,6 +83,8 @@ import app.fitmess.ui.theme.WarmMilkCanvas
 @Composable
 fun BloomLoginScreen(
     modifier: Modifier = Modifier,
+    isGoogleContinuePending: Boolean = false,
+    onGoogleContinueClick: () -> Unit = {},
     onCreateAccountClick: () -> Unit = {}
 ) {
     val darkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
@@ -142,7 +145,11 @@ fun BloomLoginScreen(
                 letterSpacing = 0.sp
             )
             Spacer(Modifier.height(if (compactHeight) 88.dp else 164.dp))
-            GoogleAuthButton(colors = colors)
+            GoogleAuthButton(
+                colors = colors,
+                isPending = isGoogleContinuePending,
+                onClick = onGoogleContinueClick
+            )
             Spacer(Modifier.height(24.dp))
             DividerLabel(colors = colors)
             Spacer(Modifier.height(24.dp))
@@ -202,7 +209,11 @@ private fun BloomBadge(colors: LoginColors, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun GoogleAuthButton(colors: LoginColors) {
+private fun GoogleAuthButton(
+    colors: LoginColors,
+    isPending: Boolean,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -210,15 +221,24 @@ private fun GoogleAuthButton(colors: LoginColors) {
             .clip(RoundedCornerShape(24.dp))
             .background(colors.googleButton)
             .border(1.dp, colors.googleButtonBorder, RoundedCornerShape(24.dp))
-            .clickable { }
+            .clickable(enabled = !isPending, onClick = onClick)
             .padding(horizontal = 28.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        GoogleGlyph()
+        if (isPending) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(28.dp),
+                color = colors.actionIcon,
+                strokeWidth = 3.dp,
+                trackColor = Color.Transparent
+            )
+        } else {
+            GoogleGlyph()
+        }
         Spacer(Modifier.width(22.dp))
         Text(
-            text = "Continue with Google",
+            text = if (isPending) "Connecting..." else "Continue with Google",
             color = PrimaryInk,
             fontSize = 22.sp,
             lineHeight = 28.sp,
