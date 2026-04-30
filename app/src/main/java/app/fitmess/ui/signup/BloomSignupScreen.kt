@@ -1,4 +1,4 @@
-package app.fitmess.ui.login
+package app.fitmess.ui.signup
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,23 +24,34 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.DirectionsRun
+import androidx.compose.material.icons.rounded.ChevronLeft
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.FitnessCenter
-import androidx.compose.material.icons.rounded.LocalPhone
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MonitorHeart
+import androidx.compose.material.icons.rounded.PersonOutline
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -56,6 +68,9 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -80,33 +95,41 @@ import app.fitmess.ui.theme.SoftPetalCoral
 import app.fitmess.ui.theme.WarmMilkCanvas
 
 @Composable
-fun BloomLoginScreen(
+fun BloomSignupScreen(
     modifier: Modifier = Modifier,
-    onCreateAccountClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {}
 ) {
     val darkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
-    val colors = if (darkTheme) LoginColors.dark() else LoginColors.light()
+    val colors = if (darkTheme) SignupColors.dark() else SignupColors.light()
+
+    var fullName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
 
     BoxWithConstraints(
         modifier = modifier
             .fillMaxSize()
             .background(colors.background)
-            .loginBackdrop(colors, darkTheme)
+            .signupBackdrop(colors, darkTheme)
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
         val compactHeight = maxHeight < 780.dp
-        val horizontalPadding = if (maxWidth < 370.dp) 24.dp else 28.dp
-        val headlineSize = if (maxWidth < 370.dp) 58.sp else 66.sp
-        val headlineLineHeight = if (maxWidth < 370.dp) 66.sp else 74.sp
+        val horizontalPadding = if (maxWidth < 370.dp) 20.dp else 22.dp
+        val headlineSize = if (maxWidth < 370.dp) 52.sp else 58.sp
+        val headlineLineHeight = if (maxWidth < 370.dp) 58.sp else 66.sp
 
         FitnessOrbitArt(
             colors = colors,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .offset(x = 70.dp, y = if (compactHeight) 40.dp else 62.dp)
-                .width(300.dp)
-                .height(if (compactHeight) 440.dp else 520.dp)
+                .offset(x = 58.dp, y = if (compactHeight) 32.dp else 48.dp)
+                .width(306.dp)
+                .height(if (compactHeight) 410.dp else 500.dp)
         )
 
         Column(
@@ -116,9 +139,11 @@ fun BloomLoginScreen(
                 .padding(horizontal = horizontalPadding),
             horizontalAlignment = Alignment.Start
         ) {
-            Spacer(Modifier.height(if (compactHeight) 88.dp else 126.dp))
+            Spacer(Modifier.height(if (compactHeight) 24.dp else 36.dp))
+            BackButton(colors = colors, onBackClick = onBackClick)
+            Spacer(Modifier.height(if (compactHeight) 76.dp else 92.dp))
             BrandLockup(colors = colors)
-            Spacer(Modifier.height(if (compactHeight) 42.dp else 64.dp))
+            Spacer(Modifier.height(if (compactHeight) 36.dp else 52.dp))
             Text(
                 text = buildAnnotatedString {
                     append("Stronger\nEvery\n")
@@ -132,52 +157,131 @@ fun BloomLoginScreen(
                 fontWeight = FontWeight.ExtraBold,
                 letterSpacing = 0.sp
             )
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(22.dp))
             Text(
                 text = "Move More,\nLive Better.",
                 color = colors.subtitle,
-                fontSize = 26.sp,
-                lineHeight = 34.sp,
+                fontSize = 24.sp,
+                lineHeight = 32.sp,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = 0.sp
             )
-            Spacer(Modifier.height(if (compactHeight) 88.dp else 164.dp))
-            GoogleAuthButton(colors = colors)
+            Spacer(Modifier.height(if (compactHeight) 58.dp else 92.dp))
+            SignupCard(colors = colors) {
+                Text(
+                    text = "Create your account",
+                    color = colors.cardTitle,
+                    fontSize = 24.sp,
+                    lineHeight = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 0.sp
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    text = "Join Bloom and start your fitness journey",
+                    color = colors.cardSubtitle,
+                    fontSize = 16.sp,
+                    lineHeight = 22.sp,
+                    fontWeight = FontWeight.Normal,
+                    letterSpacing = 0.sp
+                )
+                Spacer(Modifier.height(22.dp))
+                SignupField(
+                    label = "Full Name",
+                    value = fullName,
+                    onValueChange = { fullName = it },
+                    placeholder = "Enter your full name",
+                    icon = Icons.Rounded.PersonOutline,
+                    colors = colors
+                )
+                Spacer(Modifier.height(17.dp))
+                SignupField(
+                    label = "Email",
+                    value = email,
+                    onValueChange = { email = it },
+                    placeholder = "Enter your email",
+                    icon = Icons.Rounded.Email,
+                    colors = colors,
+                    keyboardType = KeyboardType.Email
+                )
+                Spacer(Modifier.height(17.dp))
+                SignupField(
+                    label = "Password",
+                    value = password,
+                    onValueChange = { password = it },
+                    placeholder = "Create a password",
+                    icon = Icons.Rounded.Lock,
+                    colors = colors,
+                    keyboardType = KeyboardType.Password,
+                    passwordVisible = passwordVisible,
+                    onPasswordVisibilityChange = { passwordVisible = !passwordVisible }
+                )
+                Spacer(Modifier.height(17.dp))
+                SignupField(
+                    label = "Confirm Password",
+                    value = confirmPassword,
+                    onValueChange = { confirmPassword = it },
+                    placeholder = "Confirm your password",
+                    icon = Icons.Rounded.Lock,
+                    colors = colors,
+                    keyboardType = KeyboardType.Password,
+                    passwordVisible = confirmPasswordVisible,
+                    onPasswordVisibilityChange = { confirmPasswordVisible = !confirmPasswordVisible }
+                )
+                Spacer(Modifier.height(28.dp))
+                PrimarySignupButton(colors = colors)
+                Spacer(Modifier.height(24.dp))
+                DividerLabel(colors = colors)
+                Spacer(Modifier.height(20.dp))
+                GoogleAuthButton(colors = colors)
+                Spacer(Modifier.height(26.dp))
+                LoginRow(colors = colors, onLoginClick = onLoginClick)
+            }
             Spacer(Modifier.height(24.dp))
-            DividerLabel(colors = colors)
-            Spacer(Modifier.height(24.dp))
-            OutlinedAuthButton(
-                text = "Continue with Email",
-                icon = Icons.Rounded.Email,
-                colors = colors
-            )
-            Spacer(Modifier.height(16.dp))
-            OutlinedAuthButton(
-                text = "Continue with Phone",
-                icon = Icons.Rounded.LocalPhone,
-                colors = colors
-            )
-            Spacer(Modifier.height(32.dp))
-            CreateAccountRow(
-                colors = colors,
-                onCreateAccountClick = onCreateAccountClick
-            )
-            Spacer(Modifier.height(40.dp))
         }
     }
 }
 
 @Composable
-private fun BrandLockup(colors: LoginColors) {
+private fun BackButton(
+    colors: SignupColors,
+    onBackClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .size(72.dp)
+            .shadow(
+                elevation = 14.dp,
+                shape = CircleShape,
+                ambientColor = colors.backShadow,
+                spotColor = colors.backShadow
+            )
+            .clip(CircleShape)
+            .background(colors.backButton)
+            .border(1.dp, colors.backBorder, CircleShape)
+            .clickable(onClick = onBackClick),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.ChevronLeft,
+            contentDescription = "Back",
+            tint = colors.actionIcon,
+            modifier = Modifier.size(34.dp)
+        )
+    }
+}
+
+@Composable
+private fun BrandLockup(colors: SignupColors) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        BloomBadge(colors = colors, modifier = Modifier.size(54.dp))
+        BloomBadge(colors = colors, modifier = Modifier.size(62.dp))
         Text(
             text = "Bloom",
             color = colors.wordmarkFallback,
-            fontSize = 33.sp,
+            fontSize = 34.sp,
             lineHeight = 40.sp,
             fontWeight = FontWeight.ExtraBold,
             letterSpacing = 0.sp,
@@ -189,7 +293,7 @@ private fun BrandLockup(colors: LoginColors) {
 }
 
 @Composable
-private fun BloomBadge(colors: LoginColors, modifier: Modifier = Modifier) {
+private fun BloomBadge(colors: SignupColors, modifier: Modifier = Modifier) {
     Canvas(modifier = modifier) {
         drawCircle(
             color = colors.badgeBorder,
@@ -202,26 +306,190 @@ private fun BloomBadge(colors: LoginColors, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun GoogleAuthButton(colors: LoginColors) {
+private fun SignupCard(
+    colors: SignupColors,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 24.dp,
+                shape = RoundedCornerShape(26.dp),
+                ambientColor = colors.cardShadow,
+                spotColor = colors.cardShadow
+            )
+            .clip(RoundedCornerShape(26.dp))
+            .background(colors.card)
+            .border(1.dp, colors.cardBorder, RoundedCornerShape(26.dp))
+            .padding(horizontal = 18.dp, vertical = 22.dp),
+        content = content
+    )
+}
+
+@Composable
+private fun SignupField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    icon: ImageVector,
+    colors: SignupColors,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    passwordVisible: Boolean = true,
+    onPasswordVisibilityChange: (() -> Unit)? = null
+) {
+    Column {
+        Text(
+            text = label,
+            color = colors.fieldLabel,
+            fontSize = 15.sp,
+            lineHeight = 20.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 0.sp
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(58.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(colors.field)
+                .border(1.dp, colors.fieldBorder, RoundedCornerShape(16.dp))
+                .padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = colors.fieldIcon,
+                modifier = Modifier.size(27.dp)
+            )
+            Spacer(Modifier.width(16.dp))
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                singleLine = true,
+                textStyle = TextStyle(
+                    color = colors.inputText,
+                    fontSize = 18.sp,
+                    lineHeight = 22.sp,
+                    fontWeight = FontWeight.Normal,
+                    letterSpacing = 0.sp
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+                visualTransformation = if (passwordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+                modifier = Modifier.weight(1f),
+                decorationBox = { innerTextField ->
+                    Box(contentAlignment = Alignment.CenterStart) {
+                        if (value.isEmpty()) {
+                            Text(
+                                text = placeholder,
+                                color = colors.placeholder,
+                                fontSize = 18.sp,
+                                lineHeight = 22.sp,
+                                fontWeight = FontWeight.Normal,
+                                letterSpacing = 0.sp
+                            )
+                        }
+                        innerTextField()
+                    }
+                }
+            )
+            if (onPasswordVisibilityChange != null) {
+                Spacer(Modifier.width(10.dp))
+                Icon(
+                    imageVector = if (passwordVisible) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
+                    contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                    tint = colors.fieldIcon,
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clickable(onClick = onPasswordVisibilityChange)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PrimarySignupButton(colors: SignupColors) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(66.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(Brush.horizontalGradient(colors.primaryButtonGradient))
+            .clickable { },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Create Account",
+            color = Color.White,
+            fontSize = 20.sp,
+            lineHeight = 24.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            letterSpacing = 0.sp
+        )
+    }
+}
+
+@Composable
+private fun DividerLabel(colors: SignupColors) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(1.dp)
+                .background(colors.divider)
+        )
+        Text(
+            text = "or",
+            color = colors.orText,
+            fontSize = 18.sp,
+            lineHeight = 22.sp,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(72.dp)
+        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(1.dp)
+                .background(colors.divider)
+        )
+    }
+}
+
+@Composable
+private fun GoogleAuthButton(colors: SignupColors) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(76.dp)
-            .clip(RoundedCornerShape(24.dp))
+            .height(60.dp)
+            .clip(RoundedCornerShape(17.dp))
             .background(colors.googleButton)
-            .border(1.dp, colors.googleButtonBorder, RoundedCornerShape(24.dp))
+            .border(1.dp, colors.googleButtonBorder, RoundedCornerShape(17.dp))
             .clickable { }
-            .padding(horizontal = 28.dp),
+            .padding(horizontal = 22.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         GoogleGlyph()
-        Spacer(Modifier.width(22.dp))
+        Spacer(Modifier.width(18.dp))
         Text(
             text = "Continue with Google",
-            color = PrimaryInk,
-            fontSize = 22.sp,
-            lineHeight = 28.sp,
+            color = colors.googleText,
+            fontSize = 20.sp,
+            lineHeight = 24.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 0.sp
         )
@@ -243,126 +511,55 @@ private fun GoogleGlyph() {
                 )
             )
         ),
-        fontSize = 34.sp,
-        lineHeight = 36.sp,
+        fontSize = 30.sp,
+        lineHeight = 32.sp,
         fontWeight = FontWeight.ExtraBold,
         letterSpacing = 0.sp
     )
 }
 
 @Composable
-private fun DividerLabel(colors: LoginColors) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(1.dp)
-                .background(colors.divider)
-        )
-        Text(
-            text = "or",
-            color = colors.orText,
-            fontSize = 20.sp,
-            lineHeight = 24.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.width(72.dp)
-        )
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .height(1.dp)
-                .background(colors.divider)
-        )
-    }
-}
-
-@Composable
-private fun OutlinedAuthButton(
-    text: String,
-    icon: ImageVector,
-    colors: LoginColors
+private fun LoginRow(
+    colors: SignupColors,
+    onLoginClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(76.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(colors.outlineButton)
-            .border(1.dp, colors.outlineBorder, RoundedCornerShape(24.dp))
-            .clickable { }
-            .padding(horizontal = 22.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = colors.actionIcon,
-            modifier = Modifier.size(34.dp)
-        )
-        Text(
-            text = text,
-            color = colors.buttonText,
-            fontSize = 22.sp,
-            lineHeight = 28.sp,
-            fontWeight = FontWeight.Normal,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.weight(1f)
-        )
-        Icon(
-            imageVector = Icons.Rounded.ChevronRight,
-            contentDescription = null,
-            tint = colors.chevron,
-            modifier = Modifier.size(34.dp)
-        )
-    }
-}
-
-@Composable
-private fun CreateAccountRow(
-    colors: LoginColors,
-    onCreateAccountClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onCreateAccountClick),
+            .clickable(onClick = onLoginClick),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "New here?",
-            color = colors.createMuted,
-            fontSize = 21.sp,
-            lineHeight = 26.sp,
-            fontWeight = FontWeight.Normal
+            text = "Already have an account?",
+            color = colors.footerMuted,
+            fontSize = 17.sp,
+            lineHeight = 22.sp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = 0.sp
         )
-        Spacer(Modifier.width(18.dp))
+        Spacer(Modifier.width(16.dp))
         Text(
-            text = "Create a new account",
+            text = "Log in",
             color = colors.actionIcon,
-            fontSize = 20.sp,
-            lineHeight = 26.sp,
+            fontSize = 18.sp,
+            lineHeight = 22.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier
+            letterSpacing = 0.sp
         )
         Spacer(Modifier.width(8.dp))
         Icon(
             imageVector = Icons.Rounded.ChevronRight,
             contentDescription = null,
             tint = colors.actionIcon,
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.size(26.dp)
         )
     }
 }
 
 @Composable
 private fun BoxScope.FitnessOrbitArt(
-    colors: LoginColors,
+    colors: SignupColors,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
@@ -372,30 +569,30 @@ private fun BoxScope.FitnessOrbitArt(
         IconBubble(
             icon = Icons.Rounded.FitnessCenter,
             colors = colors,
-            size = 148.dp,
+            size = 150.dp,
             iconSize = 82.dp,
-            modifier = Modifier.offset(x = 54.dp, y = 62.dp)
+            modifier = Modifier.offset(x = 64.dp, y = 54.dp)
         )
         IconBubble(
             icon = Icons.AutoMirrored.Rounded.DirectionsRun,
             colors = colors,
-            size = 86.dp,
+            size = 88.dp,
             iconSize = 48.dp,
-            modifier = Modifier.offset(x = 116.dp, y = 250.dp)
+            modifier = Modifier.offset(x = 126.dp, y = 228.dp)
         )
         IconBubble(
             icon = Icons.Rounded.MonitorHeart,
             colors = colors,
             size = 72.dp,
             iconSize = 42.dp,
-            modifier = Modifier.offset(x = 74.dp, y = 346.dp)
+            modifier = Modifier.offset(x = 86.dp, y = 324.dp)
         )
         IconBubble(
             icon = Icons.Rounded.FitnessCenter,
             colors = colors,
-            size = 134.dp,
+            size = 136.dp,
             iconSize = 78.dp,
-            modifier = Modifier.offset(x = 100.dp, y = 430.dp)
+            modifier = Modifier.offset(x = 112.dp, y = 410.dp)
         )
     }
 }
@@ -403,7 +600,7 @@ private fun BoxScope.FitnessOrbitArt(
 @Composable
 private fun IconBubble(
     icon: ImageVector,
-    colors: LoginColors,
+    colors: SignupColors,
     size: Dp,
     iconSize: Dp,
     modifier: Modifier = Modifier
@@ -435,7 +632,7 @@ private fun IconBubble(
     }
 }
 
-private fun Modifier.loginBackdrop(colors: LoginColors, darkTheme: Boolean): Modifier {
+private fun Modifier.signupBackdrop(colors: SignupColors, darkTheme: Boolean): Modifier {
     return drawBehind {
         drawCircle(
             brush = Brush.radialGradient(
@@ -455,63 +652,54 @@ private fun Modifier.loginBackdrop(colors: LoginColors, darkTheme: Boolean): Mod
             radius = size.maxDimension * if (darkTheme) 0.44f else 0.28f,
             center = Offset(size.width * 0.16f, size.height * 0.72f)
         )
-        drawCircle(
-            brush = Brush.radialGradient(
-                colors = colors.cornerGlow,
-                center = Offset(size.width * 1.08f, size.height * 0.98f),
-                radius = size.maxDimension * 0.22f
-            ),
-            radius = size.maxDimension * 0.22f,
-            center = Offset(size.width * 1.08f, size.height * 0.98f)
-        )
     }
 }
 
-private fun DrawScope.drawOrbitBackground(colors: LoginColors) {
+private fun DrawScope.drawOrbitBackground(colors: SignupColors) {
     drawCircle(
         color = colors.largeOrb,
-        radius = size.maxDimension * 0.46f,
-        center = Offset(size.width * 0.78f, size.height * 0.12f)
+        radius = size.maxDimension * 0.44f,
+        center = Offset(size.width * 0.82f, size.height * 0.14f)
     )
     drawCircle(
         color = colors.orbitLine,
         radius = size.minDimension * 0.36f,
-        center = Offset(size.width * 0.45f, size.height * 0.22f),
-        style = Stroke(width = 1.2.dp.toPx())
+        center = Offset(size.width * 0.52f, size.height * 0.22f),
+        style = Stroke(width = 1.1.dp.toPx())
     )
     drawCircle(
         color = colors.orbitLine.copy(alpha = colors.orbitLine.alpha * 0.72f),
         radius = size.minDimension * 0.50f,
-        center = Offset(size.width * 0.45f, size.height * 0.22f),
-        style = Stroke(width = 1.dp.toPx())
+        center = Offset(size.width * 0.52f, size.height * 0.22f),
+        style = Stroke(width = 0.9.dp.toPx())
     )
     drawCircle(
         color = colors.orbitLine,
         radius = size.minDimension * 0.45f,
-        center = Offset(size.width * 0.58f, size.height * 0.84f),
+        center = Offset(size.width * 0.64f, size.height * 0.84f),
         style = Stroke(width = 1.1.dp.toPx())
     )
     drawCircle(
         color = colors.orbitLine.copy(alpha = colors.orbitLine.alpha * 0.62f),
         radius = size.minDimension * 0.60f,
-        center = Offset(size.width * 0.58f, size.height * 0.84f),
+        center = Offset(size.width * 0.64f, size.height * 0.84f),
         style = Stroke(width = 0.8.dp.toPx())
     )
 
     val sparklePoints = listOf(
-        Offset(size.width * 0.02f, size.height * 0.19f),
-        Offset(size.width * 0.66f, size.height * 0.02f),
+        Offset(size.width * 0.04f, size.height * 0.19f),
+        Offset(size.width * 0.70f, size.height * 0.02f),
         Offset(size.width * 0.95f, size.height * 0.28f),
-        Offset(size.width * 0.78f, size.height * 0.45f),
-        Offset(size.width * 0.24f, size.height * 0.62f),
-        Offset(size.width * 0.08f, size.height * 0.84f),
+        Offset(size.width * 0.80f, size.height * 0.45f),
+        Offset(size.width * 0.26f, size.height * 0.62f),
+        Offset(size.width * 0.10f, size.height * 0.84f),
         Offset(size.width * 0.92f, size.height * 0.93f)
     )
     sparklePoints.forEachIndexed { index, point ->
         drawSparkle(
             center = point,
             color = colors.sparkle,
-            radius = if (index == 0 || index == sparklePoints.lastIndex) 7.dp.toPx() else 3.dp.toPx(),
+            radius = if (index == 0 || index == sparklePoints.lastIndex) 6.dp.toPx() else 3.dp.toPx(),
             outlined = index == 0 || index == sparklePoints.lastIndex
         )
     }
@@ -556,7 +744,7 @@ private fun DrawScope.drawSparkle(
     }
 }
 
-private fun DrawScope.drawBloomLogo(colors: LoginColors, scale: Float) {
+private fun DrawScope.drawBloomLogo(colors: SignupColors, scale: Float) {
     val center = this.center
     val petalWidth = size.minDimension * 0.19f * scale
     val petalHeight = size.minDimension * 0.27f * scale
@@ -600,7 +788,7 @@ private fun DrawScope.drawBloomLogo(colors: LoginColors, scale: Float) {
 }
 
 @Immutable
-private data class LoginColors(
+private data class SignupColors(
     val background: Color,
     val headline: Color,
     val headlineAccent: Color,
@@ -611,26 +799,37 @@ private data class LoginColors(
     val badgeBorder: Color,
     val topGlow: List<Color>,
     val bottomGlow: List<Color>,
-    val cornerGlow: List<Color>,
     val largeOrb: Color,
     val orbitLine: Color,
     val sparkle: Color,
     val bubbleFill: Color,
     val bubbleBorder: Color,
     val bubbleGlow: List<Color>,
-    val googleButton: Color,
-    val googleButtonBorder: Color,
-    val outlineButton: Color,
-    val outlineBorder: Color,
+    val backButton: Color,
+    val backBorder: Color,
+    val backShadow: Color,
+    val card: Color,
+    val cardBorder: Color,
+    val cardShadow: Color,
+    val cardTitle: Color,
+    val cardSubtitle: Color,
+    val field: Color,
+    val fieldBorder: Color,
+    val fieldLabel: Color,
+    val fieldIcon: Color,
+    val inputText: Color,
+    val placeholder: Color,
+    val primaryButtonGradient: List<Color>,
     val divider: Color,
     val orText: Color,
-    val buttonText: Color,
+    val googleButton: Color,
+    val googleButtonBorder: Color,
+    val googleText: Color,
     val actionIcon: Color,
-    val chevron: Color,
-    val createMuted: Color
+    val footerMuted: Color
 ) {
     companion object {
-        fun light() = LoginColors(
+        fun light() = SignupColors(
             background = WarmMilkCanvas,
             headline = PrimaryInk,
             headlineAccent = BloomCoralFlame,
@@ -638,7 +837,7 @@ private data class LoginColors(
             wordmarkFallback = BloomCoralFlame,
             wordmarkGradient = listOf(BloomCoralFlame, FreshCoralHighlight),
             logoGradient = listOf(FreshCoralHighlight, BloomCoralFlame, PressedEmberRed),
-            badgeBorder = BloomCoralFlame.copy(alpha = 0.56f),
+            badgeBorder = BloomCoralFlame.copy(alpha = 0.58f),
             topGlow = listOf(
                 SoftPetalCoral.copy(alpha = 0.32f),
                 SoftPetalCoral.copy(alpha = 0.10f),
@@ -647,10 +846,6 @@ private data class LoginColors(
             bottomGlow = listOf(
                 SoftPetalCoral.copy(alpha = 0.25f),
                 SoftPetalCoral.copy(alpha = 0.08f),
-                Color.Transparent
-            ),
-            cornerGlow = listOf(
-                SoftPetalCoral.copy(alpha = 0.28f),
                 Color.Transparent
             ),
             largeOrb = SoftPetalCoral.copy(alpha = 0.06f),
@@ -663,19 +858,31 @@ private data class LoginColors(
                 SoftPetalCoral.copy(alpha = 0.12f),
                 Color.Transparent
             ),
-            googleButton = Color.White.copy(alpha = 0.92f),
-            googleButtonBorder = Color.White.copy(alpha = 0.72f),
-            outlineButton = Color.White.copy(alpha = 0.46f),
-            outlineBorder = PeachHairlineBorder.copy(alpha = 0.86f),
+            backButton = Color.White.copy(alpha = 0.9f),
+            backBorder = Color.White.copy(alpha = 0.7f),
+            backShadow = SoftPetalCoral.copy(alpha = 0.22f),
+            card = Color.White.copy(alpha = 0.9f),
+            cardBorder = Color.White.copy(alpha = 0.65f),
+            cardShadow = SoftPetalCoral.copy(alpha = 0.18f),
+            cardTitle = PrimaryInk,
+            cardSubtitle = MutedWarmGray,
+            field = Color.White.copy(alpha = 0.5f),
+            fieldBorder = PeachHairlineBorder.copy(alpha = 0.95f),
+            fieldLabel = PrimaryInk,
+            fieldIcon = MutedWarmGray.copy(alpha = 0.92f),
+            inputText = PrimaryInk,
+            placeholder = MutedWarmGray.copy(alpha = 0.82f),
+            primaryButtonGradient = listOf(BloomCoralFlame, FreshCoralHighlight, BloomCoralFlame),
             divider = PeachHairlineBorder.copy(alpha = 0.9f),
             orText = MutedWarmGray,
-            buttonText = PrimaryInk,
+            googleButton = Color.White.copy(alpha = 0.64f),
+            googleButtonBorder = PeachHairlineBorder.copy(alpha = 0.74f),
+            googleText = PrimaryInk,
             actionIcon = FreshCoralHighlight,
-            chevron = MutedWarmGray.copy(alpha = 0.72f),
-            createMuted = MutedWarmGray
+            footerMuted = MutedWarmGray
         )
 
-        fun dark() = LoginColors(
+        fun dark() = SignupColors(
             background = MidnightPlumCanvas,
             headline = Color.White,
             headlineAccent = FreshCoralHighlight,
@@ -683,7 +890,7 @@ private data class LoginColors(
             wordmarkFallback = SoftPetalCoral,
             wordmarkGradient = listOf(SoftPetalCoral, FreshCoralHighlight),
             logoGradient = listOf(SoftPetalCoral, FreshCoralHighlight),
-            badgeBorder = BloomCoralFlame.copy(alpha = 0.72f),
+            badgeBorder = BloomCoralFlame.copy(alpha = 0.74f),
             topGlow = listOf(
                 DeepWineGlow.copy(alpha = 0.98f),
                 BloomCoralFlame.copy(alpha = 0.24f),
@@ -692,10 +899,6 @@ private data class LoginColors(
             bottomGlow = listOf(
                 DeepWineGlow.copy(alpha = 0.72f),
                 BloomCoralFlame.copy(alpha = 0.12f),
-                Color.Transparent
-            ),
-            cornerGlow = listOf(
-                DeepWineGlow.copy(alpha = 0.54f),
                 Color.Transparent
             ),
             largeOrb = BloomCoralFlame.copy(alpha = 0.12f),
@@ -708,32 +911,44 @@ private data class LoginColors(
                 DeepWineGlow.copy(alpha = 0.24f),
                 Color.Transparent
             ),
-            googleButton = PearlCardSurface.copy(alpha = 0.96f),
-            googleButtonBorder = Color.White.copy(alpha = 0.56f),
-            outlineButton = Color.Black.copy(alpha = 0.08f),
-            outlineBorder = RosewoodBorder.copy(alpha = 0.84f),
+            backButton = SmokedCardSurface.copy(alpha = 0.58f),
+            backBorder = RosewoodBorder.copy(alpha = 0.92f),
+            backShadow = BloomCoralFlame.copy(alpha = 0.2f),
+            card = Color(0xF20A090D),
+            cardBorder = Color(0xFF312B34),
+            cardShadow = BloomCoralFlame.copy(alpha = 0.16f),
+            cardTitle = Color.White,
+            cardSubtitle = MutedRoseGray,
+            field = Color.Black.copy(alpha = 0.1f),
+            fieldBorder = RosewoodBorder.copy(alpha = 0.82f),
+            fieldLabel = Color.White,
+            fieldIcon = SoftAshText.copy(alpha = 0.78f),
+            inputText = Color.White,
+            placeholder = MutedRoseGray,
+            primaryButtonGradient = listOf(FreshCoralHighlight, BloomCoralFlame, FreshCoralHighlight),
             divider = RosewoodBorder.copy(alpha = 0.76f),
             orText = MutedRoseGray,
-            buttonText = Color.White,
+            googleButton = Color.Black.copy(alpha = 0.08f),
+            googleButtonBorder = RosewoodBorder.copy(alpha = 0.84f),
+            googleText = Color.White,
             actionIcon = FreshCoralHighlight,
-            chevron = SoftAshText.copy(alpha = 0.78f),
-            createMuted = SoftAshText
+            footerMuted = SoftAshText.copy(alpha = 0.85f)
         )
     }
 }
 
 @Preview(showBackground = true, widthDp = 393, heightDp = 852)
 @Composable
-private fun BloomLoginScreenLightPreview() {
+private fun BloomSignupScreenLightPreview() {
     FitMessTheme(darkTheme = false) {
-        BloomLoginScreen()
+        BloomSignupScreen()
     }
 }
 
 @Preview(showBackground = true, widthDp = 393, heightDp = 852)
 @Composable
-private fun BloomLoginScreenDarkPreview() {
+private fun BloomSignupScreenDarkPreview() {
     FitMessTheme(darkTheme = true) {
-        BloomLoginScreen()
+        BloomSignupScreen()
     }
 }

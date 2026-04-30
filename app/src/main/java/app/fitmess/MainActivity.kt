@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import app.fitmess.ui.login.BloomLoginScreen
+import app.fitmess.ui.signup.BloomSignupScreen
 import app.fitmess.ui.splash.BloomSplashScreen
 import app.fitmess.ui.theme.FitMessTheme
 import kotlinx.coroutines.delay
@@ -22,19 +23,46 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FitMessTheme {
-                var showLogin by remember { mutableStateOf(false) }
+                var currentScreen by remember { mutableStateOf(BloomScreen.Splash) }
 
                 LaunchedEffect(Unit) {
                     delay(3_000)
-                    showLogin = true
+                    currentScreen = BloomScreen.Login
                 }
 
-                if (showLogin) {
-                    BloomLoginScreen(modifier = Modifier.fillMaxSize())
-                } else {
-                    BloomSplashScreen(modifier = Modifier.fillMaxSize())
+                when (currentScreen) {
+                    BloomScreen.Splash -> {
+                        BloomSplashScreen(modifier = Modifier.fillMaxSize())
+                    }
+
+                    BloomScreen.Login -> {
+                        BloomLoginScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            onCreateAccountClick = {
+                                currentScreen = BloomScreen.Signup
+                            }
+                        )
+                    }
+
+                    BloomScreen.Signup -> {
+                        BloomSignupScreen(
+                            modifier = Modifier.fillMaxSize(),
+                            onBackClick = {
+                                currentScreen = BloomScreen.Login
+                            },
+                            onLoginClick = {
+                                currentScreen = BloomScreen.Login
+                            }
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+private enum class BloomScreen {
+    Splash,
+    Login,
+    Signup
 }
