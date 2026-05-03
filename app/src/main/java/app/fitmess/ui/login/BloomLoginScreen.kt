@@ -100,8 +100,8 @@ fun BloomLoginScreen(
     ) {
         val compactHeight = maxHeight < 780.dp
         val horizontalPadding = if (maxWidth < 370.dp) 24.dp else 28.dp
-        val headlineSize = if (maxWidth < 370.dp) 58.sp else 66.sp
-        val headlineLineHeight = if (maxWidth < 370.dp) 66.sp else 74.sp
+        val headlineSize = if (maxWidth < 370.dp) 46.sp else 52.sp
+        val headlineLineHeight = if (maxWidth < 370.dp) 52.sp else 58.sp
 
         FitnessOrbitArt(
             colors = colors,
@@ -119,9 +119,9 @@ fun BloomLoginScreen(
                 .padding(horizontal = horizontalPadding),
             horizontalAlignment = Alignment.Start
         ) {
-            Spacer(Modifier.height(if (compactHeight) 88.dp else 126.dp))
+            Spacer(Modifier.height(if (compactHeight) 72.dp else 104.dp))
             BrandLockup(colors = colors)
-            Spacer(Modifier.height(if (compactHeight) 42.dp else 64.dp))
+            Spacer(Modifier.height(if (compactHeight) 20.dp else 32.dp))
             Text(
                 text = buildAnnotatedString {
                     append("Stronger\nEvery\n")
@@ -135,16 +135,16 @@ fun BloomLoginScreen(
                 fontWeight = FontWeight.ExtraBold,
                 letterSpacing = 0.sp
             )
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(16.dp))
             Text(
                 text = "Move More,\nLive Better.",
                 color = colors.subtitle,
-                fontSize = 26.sp,
-                lineHeight = 34.sp,
-                fontWeight = FontWeight.Medium,
+                fontSize = 17.sp,
+                lineHeight = 23.sp,
+                fontWeight = FontWeight.Normal,
                 letterSpacing = 0.sp
             )
-            Spacer(Modifier.height(if (compactHeight) 88.dp else 164.dp))
+            Spacer(Modifier.height(if (compactHeight) 44.dp else 72.dp))
             GoogleAuthButton(
                 colors = colors,
                 isPending = isGoogleContinuePending,
@@ -178,14 +178,14 @@ fun BloomLoginScreen(
 private fun BrandLockup(colors: LoginColors) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(14.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        BloomBadge(colors = colors, modifier = Modifier.size(54.dp))
+        BloomBadge(colors = colors, modifier = Modifier.size(44.dp))
         Text(
             text = "Bloom",
             color = colors.wordmarkFallback,
-            fontSize = 33.sp,
-            lineHeight = 40.sp,
+            fontSize = 26.sp,
+            lineHeight = 32.sp,
             fontWeight = FontWeight.ExtraBold,
             letterSpacing = 0.sp,
             style = TextStyle(
@@ -217,32 +217,32 @@ private fun GoogleAuthButton(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(76.dp)
-            .clip(RoundedCornerShape(24.dp))
+            .height(60.dp)
+            .clip(RoundedCornerShape(18.dp))
             .background(colors.googleButton)
-            .border(1.dp, colors.googleButtonBorder, RoundedCornerShape(24.dp))
+            .border(1.dp, colors.googleButtonBorder, RoundedCornerShape(18.dp))
             .clickable(enabled = !isPending, onClick = onClick)
-            .padding(horizontal = 28.dp),
+            .padding(horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         if (isPending) {
             CircularProgressIndicator(
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier.size(22.dp),
                 color = colors.actionIcon,
-                strokeWidth = 3.dp,
+                strokeWidth = 2.5.dp,
                 trackColor = Color.Transparent
             )
         } else {
             GoogleGlyph()
         }
-        Spacer(Modifier.width(22.dp))
+        Spacer(Modifier.width(14.dp))
         Text(
             text = if (isPending) "Connecting..." else "Continue with Google",
             color = PrimaryInk,
-            fontSize = 22.sp,
-            lineHeight = 28.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 17.sp,
+            lineHeight = 22.sp,
+            fontWeight = FontWeight.SemiBold,
             letterSpacing = 0.sp
         )
     }
@@ -263,8 +263,8 @@ private fun GoogleGlyph() {
                 )
             )
         ),
-        fontSize = 34.sp,
-        lineHeight = 36.sp,
+        fontSize = 26.sp,
+        lineHeight = 28.sp,
         fontWeight = FontWeight.ExtraBold,
         letterSpacing = 0.sp
     )
@@ -286,11 +286,11 @@ private fun DividerLabel(colors: LoginColors) {
         Text(
             text = "or",
             color = colors.orText,
-            fontSize = 20.sp,
-            lineHeight = 24.sp,
+            fontSize = 14.sp,
+            lineHeight = 18.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
-            modifier = Modifier.width(72.dp)
+            modifier = Modifier.width(48.dp)
         )
         Box(
             modifier = Modifier
@@ -310,25 +310,25 @@ private fun OutlinedAuthButton(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(76.dp)
-            .clip(RoundedCornerShape(24.dp))
+            .height(58.dp)
+            .clip(RoundedCornerShape(18.dp))
             .background(colors.outlineButton)
-            .border(1.dp, colors.outlineBorder, RoundedCornerShape(24.dp))
+            .border(1.dp, colors.outlineBorder, RoundedCornerShape(18.dp))
             .clickable { }
-            .padding(horizontal = 22.dp),
+            .padding(horizontal = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             tint = colors.actionIcon,
-            modifier = Modifier.size(34.dp)
+            modifier = Modifier.size(22.dp)
         )
         Text(
             text = text,
             color = colors.buttonText,
-            fontSize = 22.sp,
-            lineHeight = 28.sp,
+            fontSize = 16.sp,
+            lineHeight = 20.sp,
             fontWeight = FontWeight.Normal,
             textAlign = TextAlign.Center,
             modifier = Modifier.weight(1f)
@@ -337,7 +337,7 @@ private fun OutlinedAuthButton(
             imageVector = Icons.Rounded.ChevronRight,
             contentDescription = null,
             tint = colors.chevron,
-            modifier = Modifier.size(34.dp)
+            modifier = Modifier.size(22.dp)
         )
     }
 }
@@ -357,25 +357,25 @@ private fun CreateAccountRow(
         Text(
             text = "New here?",
             color = colors.createMuted,
-            fontSize = 21.sp,
-            lineHeight = 26.sp,
+            fontSize = 14.sp,
+            lineHeight = 18.sp,
             fontWeight = FontWeight.Normal
         )
-        Spacer(Modifier.width(18.dp))
+        Spacer(Modifier.width(6.dp))
         Text(
-            text = "Create a new account",
+            text = "Create account",
             color = colors.actionIcon,
-            fontSize = 20.sp,
-            lineHeight = 26.sp,
-            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp,
+            lineHeight = 18.sp,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier
         )
-        Spacer(Modifier.width(8.dp))
+        Spacer(Modifier.width(4.dp))
         Icon(
             imageVector = Icons.Rounded.ChevronRight,
             contentDescription = null,
             tint = colors.actionIcon,
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.size(18.dp)
         )
     }
 }

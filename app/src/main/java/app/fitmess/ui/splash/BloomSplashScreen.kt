@@ -75,9 +75,9 @@ fun BloomSplashScreen(modifier: Modifier = Modifier) {
             .navigationBarsPadding(),
         contentAlignment = Alignment.Center
     ) {
-        val logoSize = (maxWidth * 0.74f).coerceAtMost(320.dp)
-        val topGap = if (maxHeight < 760.dp) 118.dp else maxHeight * 0.23f
-        val bottomGap = if (maxHeight < 760.dp) 58.dp else 88.dp
+        val logoSize = (maxWidth * 0.36f).coerceAtMost(148.dp)
+        val topGap = if (maxHeight < 760.dp) 88.dp else maxHeight * 0.15f
+        val bottomGap = if (maxHeight < 760.dp) 44.dp else 68.dp
 
         Column(
             modifier = Modifier
@@ -90,18 +90,18 @@ fun BloomSplashScreen(modifier: Modifier = Modifier) {
                 colors = colors,
                 modifier = Modifier.size(logoSize)
             )
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(10.dp))
             BloomWordmark(colors = colors)
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
             Text(
                 text = "Let's keep growing.",
                 color = colors.subtitle,
-                fontSize = 22.sp,
-                lineHeight = 28.sp,
+                fontSize = 18.sp,
+                lineHeight = 24.sp,
                 fontWeight = FontWeight.Normal,
                 textAlign = TextAlign.Center
             )
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(28.dp))
             WellnessIconRow(colors = colors)
             Spacer(Modifier.weight(1f))
             LoadingBlock(colors = colors)
@@ -115,8 +115,8 @@ private fun BloomWordmark(colors: SplashColors) {
     Text(
         text = "Bloom",
         color = colors.wordmarkFallback,
-        fontSize = 72.sp,
-        lineHeight = 78.sp,
+        fontSize = 60.sp,
+        lineHeight = 66.sp,
         fontWeight = FontWeight.ExtraBold,
         letterSpacing = 0.sp,
         style = TextStyle(

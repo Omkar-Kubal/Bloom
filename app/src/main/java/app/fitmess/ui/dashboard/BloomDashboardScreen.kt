@@ -44,6 +44,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -90,9 +91,28 @@ import app.fitmess.ui.theme.SoftPetalCoral
 import app.fitmess.ui.theme.WarmMilkCanvas
 
 @Composable
-fun BloomDashboardScreen(modifier: Modifier = Modifier) {
+fun BloomDashboardScreen(
+    modifier: Modifier = Modifier,
+    onMoveCardTap: () -> Unit = {},
+    onWeeklyHabitsTap: () -> Unit = {},
+) {
     val darkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
     val colors = if (darkTheme) DashboardColors.dark() else DashboardColors.light()
+    val greeting = remember {
+        val hour = java.time.LocalTime.now().hour
+        when (hour) {
+            in 5..11 -> "Good morning!"
+            in 12..16 -> "Good afternoon!"
+            in 17..20 -> "Good evening!"
+            else -> "Good night!"
+        }
+    }
+    val todayDate = remember {
+        val d = java.time.LocalDate.now()
+        "Today, ${d.dayOfMonth} ${
+            d.month.getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.getDefault())
+        } ${d.year}"
+    }
 
     BoxWithConstraints(
         modifier = modifier
@@ -113,13 +133,14 @@ fun BloomDashboardScreen(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Spacer(Modifier.height(12.dp))
-            DashboardHeader(colors = colors, compact = compact)
-            MetricCards(colors = colors)
+            DashboardHeader(colors = colors, compact = compact, greeting = greeting, todayDate = todayDate)
+            MetricCards(colors = colors, onMoveCardTap = onMoveCardTap)
             PromoCard(
                 title = "Track workout",
                 body = "Log your workouts, stay consistent,\nand see your progress grow.",
                 action = "Start tracking",
                 colors = colors,
+                onClick = {},
                 artwork = { DumbbellArt(colors = colors, modifier = Modifier.size(150.dp)) }
             )
             PromoCard(
@@ -127,6 +148,7 @@ fun BloomDashboardScreen(modifier: Modifier = Modifier) {
                 body = "Congratulations on your week of habits!\nLet's keep your momentum rolling.",
                 action = "Quick check in",
                 colors = colors,
+                onClick = onWeeklyHabitsTap,
                 artwork = { ConfettiArt(colors = colors, modifier = Modifier.size(168.dp)) }
             )
             ConsistencyCard(colors = colors)
@@ -145,19 +167,19 @@ fun BloomDashboardScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun DashboardHeader(colors: DashboardColors, compact: Boolean) {
+private fun DashboardHeader(colors: DashboardColors, compact: Boolean, greeting: String, todayDate: String) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BloomBadge(colors = colors, modifier = Modifier.size(if (compact) 52.dp else 60.dp))
-            Spacer(Modifier.width(14.dp))
+            BloomBadge(colors = colors, modifier = Modifier.size(if (compact) 40.dp else 48.dp))
+            Spacer(Modifier.width(10.dp))
             Text(
                 text = "Bloom",
                 color = colors.wordmarkFallback,
-                fontSize = if (compact) 32.sp else 39.sp,
-                lineHeight = if (compact) 38.sp else 44.sp,
+                fontSize = if (compact) 26.sp else 32.sp,
+                lineHeight = if (compact) 32.sp else 38.sp,
                 fontWeight = FontWeight.ExtraBold,
                 letterSpacing = 0.sp,
                 style = TextStyle(brush = Brush.verticalGradient(colors.wordmarkGradient))
@@ -171,19 +193,19 @@ private fun DashboardHeader(colors: DashboardColors, compact: Boolean) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Good morning! 🌸",
+                    text = "$greeting 🌸",
                     color = colors.primaryText,
-                    fontSize = if (compact) 25.sp else 29.sp,
-                    lineHeight = if (compact) 31.sp else 35.sp,
+                    fontSize = if (compact) 21.sp else 24.sp,
+                    lineHeight = if (compact) 27.sp else 30.sp,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 0.sp
                 )
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(3.dp))
                 Text(
                     text = "Let's keep growing today.",
                     color = colors.secondaryText,
-                    fontSize = 16.sp,
-                    lineHeight = 22.sp,
+                    fontSize = 14.sp,
+                    lineHeight = 19.sp,
                     fontWeight = FontWeight.Normal,
                     letterSpacing = 0.sp
                 )
@@ -193,7 +215,7 @@ private fun DashboardHeader(colors: DashboardColors, compact: Boolean) {
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Today, 27 Apr 2026",
+                    text = todayDate,
                     color = colors.secondaryText,
                     fontSize = if (compact) 14.sp else 16.sp,
                     lineHeight = 20.sp,
@@ -249,7 +271,7 @@ private fun EditPill(colors: DashboardColors) {
 }
 
 @Composable
-private fun MetricCards(colors: DashboardColors) {
+private fun MetricCards(colors: DashboardColors, onMoveCardTap: () -> Unit = {}) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -258,7 +280,8 @@ private fun MetricCards(colors: DashboardColors) {
             colors = colors,
             modifier = Modifier
                 .weight(1f)
-                .height(226.dp)
+                .height(226.dp),
+            onClick = onMoveCardTap
         ) {
             MoveCardContent(colors = colors)
         }
@@ -280,24 +303,24 @@ private fun ColumnScope.MoveCardContent(colors: DashboardColors) {
             Text(
                 text = "Move",
                 color = colors.primaryText,
-                fontSize = 20.sp,
-                lineHeight = 24.sp,
+                fontSize = 16.sp,
+                lineHeight = 20.sp,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = 0.sp
             )
             Text(
                 text = "51/200",
                 color = colors.accent,
-                fontSize = 25.sp,
-                lineHeight = 31.sp,
+                fontSize = 21.sp,
+                lineHeight = 26.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 0.sp
             )
             Text(
                 text = "KCAL",
                 color = colors.secondaryText,
-                fontSize = 14.sp,
-                lineHeight = 18.sp,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
                 fontWeight = FontWeight.Normal,
                 letterSpacing = 0.sp
             )
@@ -334,8 +357,8 @@ private fun ColumnScope.CaloriesCardContent(colors: DashboardColors) {
         Text(
             text = "Calories",
             color = colors.primaryText,
-            fontSize = 22.sp,
-            lineHeight = 27.sp,
+            fontSize = 16.sp,
+            lineHeight = 20.sp,
             fontWeight = FontWeight.Bold,
             letterSpacing = 0.sp,
             modifier = Modifier.weight(1f)
@@ -343,8 +366,8 @@ private fun ColumnScope.CaloriesCardContent(colors: DashboardColors) {
         Text(
             text = "Remaining =\nGoal - Food + Exercise",
             color = colors.secondaryText,
-            fontSize = 11.sp,
-            lineHeight = 17.sp,
+            fontSize = 10.sp,
+            lineHeight = 15.sp,
             fontWeight = FontWeight.Normal,
             textAlign = TextAlign.End,
             letterSpacing = 0.sp
@@ -410,14 +433,16 @@ private fun PromoCard(
     body: String,
     action: String,
     colors: DashboardColors,
+    onClick: () -> Unit = {},
     artwork: @Composable BoxScope.() -> Unit
 ) {
     DashboardCard(
         colors = colors,
         modifier = Modifier
             .fillMaxWidth()
-            .height(104.dp),
-        contentPadding = 14.dp
+            .height(130.dp),
+        contentPadding = 14.dp,
+        onClick = onClick
     ) {
         Box(Modifier.fillMaxSize()) {
             Column(
@@ -431,20 +456,20 @@ private fun PromoCard(
                     Text(
                         text = title,
                         color = colors.primaryText,
-                        fontSize = 22.sp,
-                        lineHeight = 27.sp,
+                        fontSize = 18.sp,
+                        lineHeight = 22.sp,
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = 0.sp
                     )
-                    Spacer(Modifier.width(10.dp))
+                    Spacer(Modifier.width(8.dp))
                     BetaBadge(colors = colors)
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(6.dp))
                 Text(
                     text = body,
                     color = colors.secondaryText,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
+                    fontSize = 13.sp,
+                    lineHeight = 19.sp,
                     fontWeight = FontWeight.Normal,
                     letterSpacing = 0.sp
                 )
@@ -453,17 +478,17 @@ private fun PromoCard(
                     Text(
                         text = action,
                         color = colors.accent,
-                        fontSize = 16.sp,
-                        lineHeight = 20.sp,
+                        fontSize = 15.sp,
+                        lineHeight = 19.sp,
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 0.sp
                     )
-                    Spacer(Modifier.width(5.dp))
+                    Spacer(Modifier.width(4.dp))
                     Icon(
                         imageVector = Icons.Rounded.ChevronRight,
                         contentDescription = null,
                         tint = colors.accent,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
@@ -514,8 +539,8 @@ private fun ConsistencyCard(colors: DashboardColors) {
                     Text(
                         text = "Consistency",
                         color = colors.primaryText,
-                        fontSize = 22.sp,
-                        lineHeight = 27.sp,
+                        fontSize = 17.sp,
+                        lineHeight = 21.sp,
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = 0.sp,
                         modifier = Modifier.weight(1f)
@@ -523,16 +548,16 @@ private fun ConsistencyCard(colors: DashboardColors) {
                     Text(
                         text = "18",
                         color = colors.accent,
-                        fontSize = 21.sp,
-                        lineHeight = 26.sp,
+                        fontSize = 17.sp,
+                        lineHeight = 21.sp,
                         fontWeight = FontWeight.ExtraBold,
                         letterSpacing = 0.sp
                     )
                     Text(
                         text = "/30 days",
                         color = colors.primaryText,
-                        fontSize = 17.sp,
-                        lineHeight = 22.sp,
+                        fontSize = 14.sp,
+                        lineHeight = 18.sp,
                         fontWeight = FontWeight.Normal,
                         letterSpacing = 0.sp
                     )
@@ -824,6 +849,7 @@ private fun DashboardCard(
     colors: DashboardColors,
     modifier: Modifier = Modifier,
     contentPadding: Dp = 14.dp,
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
@@ -837,6 +863,7 @@ private fun DashboardCard(
             .clip(RoundedCornerShape(18.dp))
             .background(colors.card)
             .border(1.dp, colors.border, RoundedCornerShape(18.dp))
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(contentPadding),
         content = content
     )
