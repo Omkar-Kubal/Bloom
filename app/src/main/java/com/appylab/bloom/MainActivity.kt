@@ -27,6 +27,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +56,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.appylab.bloom.ui.theme.BloomTheme
+import kotlinx.coroutines.delay
 
 private val AbyssNavy = Color(0xFF171C2F)
 private val DeepInk = Color(0xFF001630)
@@ -75,11 +81,39 @@ class MainActivity : ComponentActivity() {
         setContent {
             BloomTheme(dynamicColor = false, darkTheme = true) {
                 Surface(color = DeepInk) {
-                    FitnessDashboard()
+                    BloomApp()
                 }
             }
         }
     }
+}
+
+@Composable
+private fun BloomApp() {
+    var showSplash by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        delay(3_000)
+        showSplash = false
+    }
+
+    if (showSplash) {
+        SplashScreen()
+    } else {
+        FitnessDashboard()
+    }
+}
+
+@Composable
+private fun SplashScreen() {
+    Image(
+        painter = painterResource(R.drawable.splash_screen),
+        contentDescription = null,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(screenBrush()),
+        contentScale = ContentScale.Crop
+    )
 }
 
 @Composable
