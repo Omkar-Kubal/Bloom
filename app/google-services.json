@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "928731271127",
+    "project_id": "bloom-00001",
+    "storage_bucket": "bloom-00001.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:928731271127:android:f22200293876a8a611c592",
+        "android_client_info": {
+          "package_name": "com.appylab.bloom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "928731271127-flljhphnapmukk5t9taj52iie6qd2mjp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.appylab.bloom",
+            "certificate_hash": "be174ba1cf083605eea68f24503bbc1b68b56081"
+          }
+        },
+        {
+          "client_id": "928731271127-tatc0olm39h09mrccg12rtjsbl9f0dp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvbLs9gc38D-1NT-nhIfSwxoCpxJqo17k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "928731271127-tatc0olm39h09mrccg12rtjsbl9f0dp4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
