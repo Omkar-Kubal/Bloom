@@ -6,16 +6,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.appylab.bloom.feature.onboarding.OnboardingViewModel
 import com.appylab.bloom.feature.onboarding.components.InputField
 import com.appylab.bloom.feature.onboarding.components.OnboardingScaffold
@@ -45,9 +44,18 @@ fun Onboarding8BodyStatsScreen(
         },
         continueEnabled = canContinue
     ) {
-        Text("Body stats", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+        Text(
+            "Body stats",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(Modifier.height(8.dp))
-        Text("Use the units you prefer. Bloom stores normalized values.", color = Color.White.copy(alpha = 0.7f), fontSize = 16.sp)
+        Text(
+            "Use the units you prefer. Bloom stores normalized values.",
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+            style = MaterialTheme.typography.bodyLarge
+        )
         Spacer(Modifier.height(24.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -114,7 +122,6 @@ private fun parseHeight(input: String, unit: String): Float {
     val value = input.toFloatOrNull() ?: return 0f
     return if (unit == "ftin") value * 2.54f else value
 }
-
 private fun displayWeight(weightKg: Float, unit: String): Float = if (unit == "lbs") weightKg * 2.20462f else weightKg
 private fun parseWeight(input: String, unit: String): Float {
     val value = input.toFloatOrNull() ?: return 0f

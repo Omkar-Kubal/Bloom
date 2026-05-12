@@ -2,15 +2,14 @@ package com.appylab.bloom.feature.onboarding.screens
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.appylab.bloom.feature.onboarding.OnboardingViewModel
 import com.appylab.bloom.feature.onboarding.components.OnboardingScaffold
 import com.appylab.bloom.feature.onboarding.components.RadioOptionCard
@@ -33,9 +32,18 @@ fun Onboarding6ActivityScreen(
         onContinue = onNext,
         continueEnabled = state.activityLevel.isNotBlank()
     ) {
-        Text("How active are you?", color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Bold)
+        Text(
+            "How active are you?",
+            color = MaterialTheme.colorScheme.onBackground,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
         Spacer(Modifier.height(8.dp))
-        Text("This helps Bloom estimate your daily energy needs.", color = Color.White.copy(alpha = 0.7f), fontSize = 16.sp)
+        Text(
+            "This helps Bloom estimate your daily energy needs.",
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+            style = MaterialTheme.typography.bodyLarge
+        )
         Spacer(Modifier.height(28.dp))
         options.forEach { (value, label, description) ->
             RadioOptionCard(

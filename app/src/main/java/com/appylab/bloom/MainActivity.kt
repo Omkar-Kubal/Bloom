@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            BloomTheme(dynamicColor = false, darkTheme = true) {
+            BloomTheme {
                 Surface {
                     BloomApp()
                 }

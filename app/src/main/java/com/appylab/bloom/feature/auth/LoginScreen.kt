@@ -2,27 +2,26 @@ package com.appylab.bloom.feature.auth
 
 import android.app.Activity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.appylab.bloom.R
-import com.appylab.bloom.core.ui.*
+import com.appylab.bloom.core.ui.screenBrush
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
@@ -76,25 +75,25 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(screenBrush())
-            .padding(24.dp),
+            .statusBarsPadding()
+            .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(40.dp))
-        
+
         Text(
             text = "Welcome back!",
-            color = Color.White,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.align(Alignment.Start)
         )
-        
+
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         Text(
             text = "Log in to continue your journey toward a better you",
-            color = Color.White.copy(alpha = 0.7f),
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
             modifier = Modifier.align(Alignment.Start)
         )
 
@@ -103,20 +102,21 @@ fun LoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            placeholder = { Text("Enter your email", color = Color.Gray) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFF1E1E2E), RoundedCornerShape(12.dp))
-                .border(1.dp, SlateBorder, RoundedCornerShape(12.dp)),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.White,
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White
+            label = { Text("Email") },
+            placeholder = { Text("Enter your email") },
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
             ),
+            shape = MaterialTheme.shapes.small,
             singleLine = true
         )
 
@@ -125,31 +125,31 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            placeholder = { Text("Enter your password", color = Color.Gray) },
+            label = { Text("Password") },
+            placeholder = { Text("Enter your password") },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                val icon = if (passwordVisible) "Hide" else "Show"
-                Text(
-                    text = icon,
-                    color = Color.Gray,
-                    modifier = Modifier
-                        .clickable { passwordVisible = !passwordVisible }
-                        .padding(8.dp)
-                )
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                        contentDescription = if (passwordVisible) "Hide password" else "Show password",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFF1E1E2E), RoundedCornerShape(12.dp))
-                .border(1.dp, SlateBorder, RoundedCornerShape(12.dp)),
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.White,
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
             ),
+            shape = MaterialTheme.shapes.small,
             singleLine = true
         )
 
@@ -157,8 +157,9 @@ fun LoginScreen(
 
         Text(
             text = "Forgot password?",
-            color = HotRed,
-            fontSize = 14.sp,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Medium,
             modifier = Modifier
                 .align(Alignment.End)
                 .clickable { /* Handle forgot password */ }
@@ -168,8 +169,8 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = (authState as AuthState.Error).message,
-                color = HotRed,
-                fontSize = 14.sp
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error
             )
         }
 
@@ -179,27 +180,35 @@ fun LoginScreen(
             onClick = { viewModel.signIn(email, password) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = HotRed),
-            shape = RoundedCornerShape(28.dp)
+                .height(52.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            shape = MaterialTheme.shapes.large
         ) {
             if (authState is AuthState.Loading) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(22.dp),
+                    strokeWidth = 2.dp
+                )
             } else {
-                Text("Login", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text("Login", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Divider(modifier = Modifier.weight(1f), color = SlateBorder)
+            HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
             Text(
                 text = "or continue with",
-                color = Color.Gray,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
-            Divider(modifier = Modifier.weight(1f), color = SlateBorder)
+            HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.outlineVariant)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -208,25 +217,38 @@ fun LoginScreen(
             onClick = { launchGoogleSignIn() },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(28.dp),
-            border = androidx.compose.foundation.BorderStroke(1.dp, SlateBorder)
+                .height(52.dp),
+            shape = MaterialTheme.shapes.large,
+            border = ButtonDefaults.outlinedButtonBorder.copy(
+                width = 1.dp
+            ),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = MaterialTheme.colorScheme.onSurface
+            )
         ) {
-            Text("Continue with Google", color = Color.White, fontSize = 16.sp)
+            Text(
+                "Continue with Google",
+                style = MaterialTheme.typography.labelLarge
+            )
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
         Row {
-            Text("Don't have an account? ", color = Color.Gray)
             Text(
-                "Signup",
-                color = HotRed,
+                "Don't have an account? ",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+            )
+            Text(
+                "Sign up",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { onNavigateToSignUp() }
             )
         }
-        
+
         Spacer(modifier = Modifier.height(32.dp))
     }
 }

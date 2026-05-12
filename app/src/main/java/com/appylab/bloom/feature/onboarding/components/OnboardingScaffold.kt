@@ -7,13 +7,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.appylab.bloom.core.ui.*
+import com.appylab.bloom.core.ui.screenBrush
 
 @Composable
 fun OnboardingScaffold(
@@ -24,12 +21,17 @@ fun OnboardingScaffold(
     continueEnabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val primary = MaterialTheme.colorScheme.primary
+    val surfaceVariant = MaterialTheme.colorScheme.surfaceVariant
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(screenBrush())
+            .statusBarsPadding()
             .padding(24.dp)
     ) {
+        // Progress bar
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -41,7 +43,7 @@ fun OnboardingScaffold(
                         .height(4.dp)
                         .padding(horizontal = 2.dp)
                         .background(
-                            if (i <= currentStep) HotRed else MutedSteel,
+                            if (i <= currentStep) primary else surfaceVariant,
                             RoundedCornerShape(2.dp)
                         )
                 )
@@ -50,23 +52,13 @@ fun OnboardingScaffold(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Box(
+        Column(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-        ) {
-            MascotArt(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(104.dp)
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-                content = content
-            )
-        }
+                .verticalScroll(rememberScrollState()),
+            content = content
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -75,23 +67,33 @@ fun OnboardingScaffold(
             enabled = continueEnabled,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(52.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = HotRed,
-                disabledContainerColor = HotRed.copy(alpha = 0.5f)
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
             ),
-            shape = RoundedCornerShape(28.dp)
+            shape = MaterialTheme.shapes.large
         ) {
-            Text("Continue ->", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(
+                "Continue",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold
+            )
         }
 
         if (onSkip != null) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             TextButton(
                 onClick = onSkip,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Skip for now", color = Color.Gray, fontSize = 14.sp)
+                Text(
+                    "Skip for now",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }

@@ -6,6 +6,5 @@ enum class AppDestination(
     Dashboard("Dashboard"),
     Workout("Workout"),
     Food("Food"),
-    Run("Run"),
-    Profile("Profile")
+    Run("Run")
 }

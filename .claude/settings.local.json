@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(ls -lah /d/bloom/app/src/main/res/mipmap-*/)",
+      "Bash(./gradlew assembleDebug)"
     ]
   }
 }

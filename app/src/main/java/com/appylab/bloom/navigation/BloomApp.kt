@@ -1,8 +1,18 @@
 package com.appylab.bloom.navigation
 
-import androidx.compose.foundation.Image
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -10,16 +20,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.appylab.bloom.core.ui.HotRed
+import com.appylab.bloom.core.ui.MutedSteel
+import com.appylab.bloom.core.ui.TextWhite
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.appylab.bloom.R
 import com.appylab.bloom.core.ui.screenBrush
+import com.appylab.bloom.feature.auth.GetStartedScreen
 import com.appylab.bloom.feature.auth.LoginScreen
 import com.appylab.bloom.feature.auth.SignUpScreen
 import com.appylab.bloom.feature.dashboard.DashboardScreen
@@ -70,29 +86,27 @@ fun BloomApp(
     }
 
     val onboardingViewModel: OnboardingViewModel = hiltViewModel()
-    val startDestination = if (onboardingComplete) RouteDashboard else RouteSignUp
+    val startDestination = if (onboardingComplete) RouteDashboard else RouteGetStarted
 
     NavHost(navController = navController, startDestination = startDestination) {
-        composable(RouteSignUp) {
-            SignUpScreen(
-                onNavigateToLogin = { navController.navigate(RouteLogin) },
-                onNavigateToOnboarding = {
-                    navController.navigate(RouteOnboarding1) {
-                        popUpTo(RouteSignUp) { inclusive = true }
-                    }
-                }
+        // ── Entry ──────────────────────────────────────────────────────────
+        composable(RouteGetStarted) {
+            GetStartedScreen(
+                onGetStarted = { navController.navigate(RouteOnboarding1) },
+                onLogin = { navController.navigate(RouteLogin) }
             )
         }
         composable(RouteLogin) {
             LoginScreen(
-                onNavigateToSignUp = { navController.popBackStack() },
+                onNavigateToSignUp = { navController.navigate(RouteSignUp) },
                 onNavigateToDashboard = {
                     navController.navigate(RouteDashboard) {
-                        popUpTo(RouteSignUp) { inclusive = true }
+                        popUpTo(RouteGetStarted) { inclusive = true }
                     }
                 }
             )
         }
+        // ── Onboarding ─────────────────────────────────────────────────────
         composable(RouteOnboarding1) { Onboarding1WelcomeScreen(onboardingViewModel) { navController.navigate(RouteOnboarding2) } }
         composable(RouteOnboarding2) { Onboarding2GoalScreen(onboardingViewModel) { navController.navigate(RouteOnboarding3) } }
         composable(RouteOnboarding3) { Onboarding3Motivational { navController.navigate(RouteOnboarding4) } }
@@ -111,11 +125,22 @@ fun BloomApp(
                 }
             }
         }
+        // ── Paywall → SignUp ───────────────────────────────────────────────
         composable(RoutePaywall) {
             PaywallScreen(
                 onTrialStarted = {
-                    navController.navigate(RouteDashboard) {
+                    navController.navigate(RouteSignUp) {
                         popUpTo(RoutePaywall) { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable(RouteSignUp) {
+            SignUpScreen(
+                onNavigateToLogin = { navController.navigate(RouteLogin) },
+                onNavigateToOnboarding = {
+                    navController.navigate(RouteDashboard) {
+                        popUpTo(RouteGetStarted) { inclusive = true }
                     }
                 }
             )
@@ -223,7 +248,6 @@ private fun NavHostController.navigateToTab(destination: AppDestination) {
         AppDestination.Workout -> RouteWorkout
         AppDestination.Food -> RouteFood
         AppDestination.Run -> RouteRun
-        AppDestination.Profile -> RouteProfile
     }
     navigate(route) {
         launchSingleTop = true
@@ -234,18 +258,42 @@ private fun NavHostController.navigateToTab(destination: AppDestination) {
 
 @Composable
 private fun SplashScreen() {
-    Image(
-        painter = painterResource(R.drawable.splash_screen),
-        contentDescription = null,
+    val progress = remember { Animatable(0f) }
+    LaunchedEffect(Unit) {
+        progress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(durationMillis = 2_400, easing = FastOutSlowInEasing)
+        )
+    }
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(screenBrush()),
-        contentScale = ContentScale.Crop
-    )
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "bloom",
+                color = TextWhite,
+                fontSize = 52.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+            Spacer(Modifier.height(20.dp))
+            LinearProgressIndicator(
+                progress = { progress.value },
+                modifier = Modifier
+                    .width(140.dp)
+                    .clip(RoundedCornerShape(99.dp)),
+                color = HotRed,
+                trackColor = MutedSteel
+            )
+        }
+    }
 }
 
 private const val SplashDurationMillis = 3_000L
 
+private const val RouteGetStarted = "auth/get-started"
 private const val RouteSignUp = "auth/signup"
 private const val RouteLogin = "auth/login"
 private const val RouteOnboarding1 = "onboarding/1"
